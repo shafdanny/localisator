@@ -8,18 +8,30 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class MyService extends Service {
     public static final String TAG = "TestGPS";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 10;
+    private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 0f;
 
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
+        String fichier = "donnees.txt";
+        File mDir = null;
+        File mFile = null;
+        String donnees;
+        Double altitude;
 
 
 
@@ -32,6 +44,31 @@ public class MyService extends Service {
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
+
+            altitude = Location.convert(String.valueOf(location.getAltitude()));
+            donnees = "Latitude : " + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " Longitude : " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) + "Altitude : " + altitude + "\n";
+
+            // Ecriture dans le .txt
+
+            //Création du dossier "Coordonnees" à la racine de la mémoire internet du téléphone
+            mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
+            // mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Android/data/ " + getPackageName() + "/files/");
+            mDir.mkdirs();
+
+            // Création du fichier "donnees.txt" dans le dossier "Coordonnees"
+            mFile = new File(mDir, fichier);
+            try {
+                mFile.createNewFile();
+                FileWriter fileWriter = new FileWriter(mFile, true);
+                fileWriter.write(donnees);
+                fileWriter.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
         @Override
