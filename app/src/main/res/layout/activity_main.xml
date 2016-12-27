@@ -8,10 +8,73 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.polytech.mathieu.localisator1.MainActivity">
+    tools:context="com.polytech.mathieu.localisator1.Localisation.MainActivity">
 
-    <TextView
+
+
+    <Button
+        android:text="Lancement Service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/start" />
+
+    <TextView
+        android:text="Coordonnées"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/coordonnees"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="168dp" />
+
+    <Button
+        android:text="Arret Service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/start"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="22dp"
+        android:id="@+id/stop"
+        android:layout_alignRight="@+id/start"
+        android:layout_alignEnd="@+id/start" />
+
+    <Button
+        android:text="Suppression Données"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:id="@+id/erase"
+        android:layout_below="@+id/stop"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/stop"
+        android:layout_alignEnd="@+id/stop" />
+
+    <Button
+        android:text="Envoie Données"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/launch"
+        android:layout_alignRight="@+id/erase"
+        android:layout_alignEnd="@+id/erase" />
+
+    <TextView
+        android:id="@+id/infoport"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:textStyle="italic"
+        android:layout_alignTop="@+id/coordonnees"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="46dp" />
+
+
 </RelativeLayout>
