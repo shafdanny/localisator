@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.polytech.mathieu.localisator1.Maps.MapsActivity;
 import com.polytech.mathieu.localisator1.R;
 
 import org.w3c.dom.Text;
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean service_lance = false;
     public static TextView textView;
 
-    static final int SocketServerPORT = 3333;
+    static final int SocketServerPORT = 8181;
     ServerSocket serverSocket;
+    public boolean launch = false;
 
     ServerSocketThread serverSocketThread;
 
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonStop = (Button) findViewById(R.id.stop);
         final Button buttonErase = (Button) findViewById(R.id.erase);
         final Button buttonLaunch = (Button) findViewById(R.id.launch);
+        final Button buttonMap = (Button) findViewById(R.id.bmap);
 
         serverSocketThread = new ServerSocketThread();
 
@@ -89,8 +92,19 @@ public class MainActivity extends AppCompatActivity {
 
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d(MyService.TAG, "Envoie données!\n");
-                serverSocketThread.start();
+                if (!launch){
+                    launch = true;
+                    Log.d(MyService.TAG, "Envoie données!\n");
+                    serverSocketThread.start();
+                }
+            }
+        });
+
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.d(MyService.TAG, "Lancement acitivité map!\n");
+                Intent intent1 = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(intent1);
             }
         });
     }
@@ -123,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             Socket socket = null;
-            Log.e(TAG, "En attente d'une connexion...\n");
+           // Log.e(TAG, "En attente d'une connexion...\n");
             try {
                 serverSocket = new ServerSocket(SocketServerPORT);
                 MainActivity.this.runOnUiThread(new Runnable() {
@@ -133,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
                     }});
 
                 while (true) {
+                    Log.e(TAG, "En attente d'une connexion...\n");
                     socket = serverSocket.accept();
+                    Log.e(TAG, "Connexion établie...\n");
                     MainActivity.FileTxThread fileTxThread = new MainActivity.FileTxThread(socket);
                     fileTxThread.start();
                 }
@@ -197,7 +213,10 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             } finally {
                 try {
+                    launch = true;
+                    Log.e(TAG, "Fermeture de la socket");
                     socket.close();
+                    this.interrupt();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

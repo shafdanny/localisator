@@ -77,10 +77,10 @@ public class MyService extends Service {
             Date tmp = new Date(location.getTime());
             date = format.format(tmp);
 
-            donnees = "Temps," + date +
-                    "Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
-                    ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
-                    ",Altitude," + altitude +
+            donnees = "Temps." + date +
+                    ".Latitude." + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
+                    ".Longitude." + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
+                    ".Altitude." + altitude +
                     "\n";
 
 
