@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+// Méthode qui supprime les données dans le json
     public void erase(){
         String fichier = "donnees.json";
         // Ecriture dans le .json
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Création du thread qui attend une connexion
     public class ServerSocketThread extends Thread {
 
         @Override
@@ -170,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Thread qui envoie le .json quand une demande est faite
     public class FileTxThread extends Thread {
         Socket socket;
 
