@@ -14,8 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -24,7 +22,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.polytech.mathieu.localisator1.Localisation.MainActivity.textView;
-import static com.polytech.mathieu.localisator1.R.id.time;
 
 
 /*
@@ -37,7 +34,7 @@ import static com.polytech.mathieu.localisator1.R.id.time;
 public class MyService extends Service {
 
 
-    DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    DateFormat format = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
 
     //TAG pour les tests
     public static final String TAG = "TestGPS";
@@ -48,13 +45,35 @@ public class MyService extends Service {
     private static final float LOCATION_DISTANCE = 0f;
 
 
+    //Variables pour l'écriture dans le json
+    String fichier = "donnees.json";
+    File mDir = null;
+    File mFile = null;
+
+    public MyService() {
+        createGpsFile();
+    }
+
+    private void createGpsFile() {
+        //Création du dossier "Coordonnees" à la racine de la mémoire internet du téléphone
+        mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
+        mDir.mkdirs();
+
+        // Création du fichier "donnees.json" dans le dossier "Coordonnees"
+        mFile = new File(mDir, fichier);
+        try {
+            mFile.createNewFile();
+            FileWriter fileWriter = new FileWriter(mFile, true);
+            fileWriter.write("date,time,latitude,longitude,altitude \n");
+            fileWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public class LocationListener implements android.location.LocationListener {
-
-        //Variables pour l'écriture dans le json
-        String fichier = "donnees.json";
-        File mDir = null;
-        File mFile = null;
 
         //Variables pour les données
         Location mLastLocation;
@@ -67,6 +86,7 @@ public class MyService extends Service {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
+
 
         //A chaque fois que la localisation change, cette fonction est appelée
         @Override
@@ -84,14 +104,16 @@ public class MyService extends Service {
             double longitude = mLastLocation.getLongitude();
             String sLongitude = String.format(Locale.US,"%8.6f", longitude);
 
+            /*
             donnees = "Temps," + date +
                    // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
                     ",Latitude," + sLatitude +
                    // ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
                     ",Longitude," + sLongitude +
                     ",Altitude," + altitude +
-                    "\n";
+                    "\n";*/
 
+            donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
 
             textView.setText(donnees);
 
@@ -113,8 +135,6 @@ public class MyService extends Service {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         @Override
