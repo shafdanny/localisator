@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.polytech.mathieu.localisator1.Localisation.MainActivity.textView;
 import static com.polytech.mathieu.localisator1.R.id.time;
@@ -77,10 +78,18 @@ public class MyService extends Service {
             Date tmp = new Date(location.getTime());
             date = format.format(tmp);
 
-            donnees = "Temps." + date +
-                    ".Latitude." + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
-                    ".Longitude." + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
-                    ".Altitude." + altitude +
+            double latitude = mLastLocation.getLatitude();
+            String sLatitude = String.format(Locale.US,"%8.6f", latitude);
+
+            double longitude = mLastLocation.getLongitude();
+            String sLongitude = String.format(Locale.US,"%8.6f", longitude);
+
+            donnees = "Temps," + date +
+                   // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
+                    ",Latitude," + sLatitude +
+                   // ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
+                    ",Longitude," + sLongitude +
+                    ",Altitude," + altitude +
                     "\n";
 
 

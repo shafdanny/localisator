@@ -19,6 +19,7 @@ import com.polytech.mathieu.localisator1.R;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    public Traitement traitement = new Traitement();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +46,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        traitement.recuperation();
+
         // Add a marker in Biot and move the camera
         LatLng biot = new LatLng(43.616745, 7.066663);
-        mMap.addMarker(new MarkerOptions().position(biot).title("Sophia Antipolis"));
+
+        mMap.addMarker(new MarkerOptions().position(Traitement.cluster1).title("Cluster1"));
+        mMap.addMarker(new MarkerOptions().position(Traitement.cluster2).title("Cluster2"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(biot));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
     }

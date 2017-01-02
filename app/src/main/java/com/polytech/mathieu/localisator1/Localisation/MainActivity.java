@@ -19,11 +19,14 @@ import com.polytech.mathieu.localisator1.R;
 import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -80,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(MyService.TAG, "Service arrêté!\n");
                 stopService(intent);
+
             }
         });
 
@@ -181,23 +185,40 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            File file = new File(
+            File file1 = new File(
                     Environment.getExternalStorageDirectory().getPath()+"/Coordonnees",
                     "donnees.json");
 
+            File file2 = new File(
+                    Environment.getExternalStorageDirectory().getPath()+"/Coordonnees",
+                    "traitement.json");
+
             Log.e(TAG, "Envoie du fichier...\n");
 
-            byte[] bytes = new byte[(int) file.length()];
+            byte[] bytes = new byte[(int) file1.length()];
             BufferedInputStream bis;
             try {
-                bis = new BufferedInputStream(new FileInputStream(file));
+                bis = new BufferedInputStream(new FileInputStream(file1));
                 bis.read(bytes, 0, bytes.length);
                 OutputStream os = socket.getOutputStream();
                 os.write(bytes, 0, bytes.length);
                 os.flush();
+
+
+                //Test
+                System.out.println("Reception du fichier...");
+                byte[] bytes2 = new byte[1024];
+                InputStream is = socket.getInputStream();
+                FileOutputStream fos = new FileOutputStream(file2);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                int bytesRead = is.read(bytes2, 0, bytes2.length);
+                bos.write(bytes2, 0, bytesRead);
+                bos.close();
+
+
                 socket.close();
 
-                final String sentMsg = "File sent to: " + socket.getInetAddress();
+        /*        final String sentMsg = "File sent to: " + socket.getInetAddress();
                 MainActivity.this.runOnUiThread(new Runnable() {
 
                     @Override
@@ -205,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this,
                                 sentMsg,
                                 Toast.LENGTH_LONG).show();
-                    }});
+                    }}); */
 
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
