@@ -46,7 +46,7 @@ public class MyService extends Service {
 
 
     //Variables pour l'écriture dans le json
-    String fichier = "donnees.json";
+    String fichier = "donnees.csv";
     File mDir = null;
     File mFile = null;
 
