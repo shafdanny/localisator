@@ -108,14 +108,14 @@ public class MyService extends Service {
 
 
             donnees = "Temps," + date +
-                   // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
+                    // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
                     ",Latitude," + sLatitude +
-                   // ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
+                    // ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
                     ",Longitude," + sLongitude +
                     ",Altitude," + altitude +
                     "\n";
 
-         //   donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
+            //   donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
 
             textView.setText(donnees);
 

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView textView;
 
     static final int SocketServerPORT = 8181;
-    private final String ServerAdress = "192.168.1.115";
+    private final String ServerAdress = "192.168.1.179";
 
     Socket clientSocket;
     public boolean launch = false;
