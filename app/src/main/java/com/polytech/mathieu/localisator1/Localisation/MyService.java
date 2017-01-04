@@ -46,10 +46,12 @@ public class MyService extends Service {
 
 
     //Variables pour l'écriture dans le json
-    String fichier = "donnees.csv";
+    String fichier = "donnees.json";
     File mDir = null;
     File mFile = null;
 
+
+    /*
     public MyService() {
         createGpsFile();
     }
@@ -70,7 +72,7 @@ public class MyService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } */
 
 
     public class LocationListener implements android.location.LocationListener {
@@ -104,16 +106,16 @@ public class MyService extends Service {
             double longitude = mLastLocation.getLongitude();
             String sLongitude = String.format(Locale.US,"%8.6f", longitude);
 
-            /*
+
             donnees = "Temps," + date +
                    // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
                     ",Latitude," + sLatitude +
                    // ",Longitude," + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) +
                     ",Longitude," + sLongitude +
                     ",Altitude," + altitude +
-                    "\n";*/
+                    "\n";
 
-            donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
+         //   donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
 
             textView.setText(donnees);
 

@@ -98,17 +98,17 @@ public class MainActivity extends AppCompatActivity {
 
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                /*
+
                 if (!launch){
                     launch = true;
                     Log.d(MyService.TAG, "Envoie données!\n");
                     uploadFile(Uri.parse(""));
 
-                    //serverSocketThread.start();
-                }*/
-
+                    serverSocketThread.start();
+                }
+/*
                 Log.d(MyService.TAG, "Envoie données!\n");
-                uploadFile(Uri.parse(""));
+                uploadFile(Uri.parse("")); */
             }
         });
 
@@ -128,9 +128,9 @@ public class MainActivity extends AppCompatActivity {
                 ServiceGenerator.createService(FileUploadService.class);
 
         File mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
-        File file = new File(mDir, "donnees.csv");
+        File file = new File(mDir, "donnees.json");
 
-
+/*
         // create RequestBody instance from file
         RequestBody requestFile =
                 RequestBody.create(MediaType.parse("multipart/form-data"), file);
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
             }
-        });
+        }); */
     }
 
 // Méthode qui supprime les données dans le json
