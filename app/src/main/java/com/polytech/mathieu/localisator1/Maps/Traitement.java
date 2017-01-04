@@ -42,12 +42,13 @@ public class Traitement {
             e.printStackTrace();
         }
 
-        int i = 0;
+        int i = 1;
 
         try {
-            while ( (myLine = bufRead.readLine()) != null){
+            while ( (myLine = bufRead.readLine()) != null && i < 3){
                 String[] array = myLine.split(",");
-               //valeur++;
+                i++;
+                System.out.println("Array 1 " + array[1]);
 
                 list.add(Float.parseFloat(array[1]));
                 list.add(Float.parseFloat(array[3]));

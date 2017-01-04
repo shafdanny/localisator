@@ -27,16 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     public static TextView textView;
 
     static final int SocketServerPORT = 8181;
-    ServerSocket serverSocket;
+    private final String ServerAdress = "192.168.1.115";
+
+    Socket clientSocket;
     public boolean launch = false;
 
     ServerSocketThread serverSocketThread;
@@ -72,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonLaunch = (Button) findViewById(R.id.launch);
         final Button buttonMap = (Button) findViewById(R.id.bmap);
 
-        serverSocketThread = new ServerSocketThread();
-
         buttonStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                         Log.d(MyService.TAG, "Service lancé!\n");
@@ -99,16 +90,11 @@ public class MainActivity extends AppCompatActivity {
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                if (!launch){
-                    launch = true;
-                    Log.d(MyService.TAG, "Envoie données!\n");
-                    uploadFile(Uri.parse(""));
-
-                    serverSocketThread.start();
-                }
-/*
                 Log.d(MyService.TAG, "Envoie données!\n");
-                uploadFile(Uri.parse("")); */
+                uploadFile(Uri.parse(""));
+
+                serverSocketThread = new ServerSocketThread();
+                serverSocketThread.start();
             }
         });
 
@@ -191,20 +177,14 @@ public class MainActivity extends AppCompatActivity {
             Socket socket = null;
            // Log.e(TAG, "En attente d'une connexion...\n");
             try {
-                serverSocket = new ServerSocket(SocketServerPORT);
-                MainActivity.this.runOnUiThread(new Runnable() {
+                clientSocket = new Socket(ServerAdress, SocketServerPORT);
 
-                    @Override
-                    public void run() {
-                    }});
+                Log.e(TAG, "Connexion au serveur...\n");;
+                Log.e(TAG, "Connexion établie...\n");
+                MainActivity.FileTxThread fileTxThread = new MainActivity.FileTxThread(clientSocket);
+                fileTxThread.start();
 
-                while (true) {
-                    Log.e(TAG, "En attente d'une connexion...\n");
-                    socket = serverSocket.accept();
-                    Log.e(TAG, "Connexion établie...\n");
-                    MainActivity.FileTxThread fileTxThread = new MainActivity.FileTxThread(socket);
-                    fileTxThread.start();
-                }
+
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
