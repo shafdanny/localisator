@@ -38,7 +38,6 @@ import java.util.Enumeration;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "TestGPS";
-    private boolean service_lance = false;
     public static TextView textView;
 
     static final int SocketServerPORT = 8181;

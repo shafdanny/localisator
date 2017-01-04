@@ -51,8 +51,6 @@ public class Traitement {
 
                 list.add(Float.parseFloat(array[1]));
                 list.add(Float.parseFloat(array[3]));
-                //double x = Float.parseFloat(array[3]);
-                //double y = Float.parseFloat(array[5]);
             }
 
             cluster1 = new LatLng(list.get(0), list.get(1));
