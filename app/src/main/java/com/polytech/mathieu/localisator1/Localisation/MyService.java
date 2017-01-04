@@ -83,7 +83,7 @@ public class MyService extends Service {
 
             double longitude = mLastLocation.getLongitude();
             String sLongitude = String.format(Locale.US,"%8.6f", longitude);
-//
+
             donnees = "Temps," + date +
                    // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
                     ",Latitude," + sLatitude +
