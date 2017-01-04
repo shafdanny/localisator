@@ -2,21 +2,20 @@ package com.polytech.mathieu.localisator1.Localisation;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.polytech.mathieu.localisator1.Maps.MapsActivity;
 import com.polytech.mathieu.localisator1.R;
-
-import org.w3c.dom.Text;
+import com.polytech.mathieu.localisator1.network.FileUploadService;
+import com.polytech.mathieu.localisator1.network.ServiceGenerator;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,12 +27,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Enumeration;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,11 +98,17 @@ public class MainActivity extends AppCompatActivity {
 
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                /*
                 if (!launch){
                     launch = true;
                     Log.d(MyService.TAG, "Envoie données!\n");
-                    serverSocketThread.start();
-                }
+                    uploadFile(Uri.parse(""));
+
+                    //serverSocketThread.start();
+                }*/
+
+                Log.d(MyService.TAG, "Envoie données!\n");
+                uploadFile(Uri.parse(""));
             }
         });
 
@@ -112,6 +121,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Charger le fichier gps vers le serveur
+    private void uploadFile(Uri fileUri) {
+        // create upload service client
+        FileUploadService service =
+                ServiceGenerator.createService(FileUploadService.class);
+
+        File mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
+        File file = new File(mDir, "donnees.csv");
+
+
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        // add another part within the multipart request
+        String descriptionString = "hello, this is description speaking";
+        RequestBody description =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"), descriptionString);
+
+        // finally, execute the request
+        Call<ResponseBody> call = service.upload(description, body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v("Upload", "success");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+    }
 
 // Méthode qui supprime les données dans le json
     public void erase(){
