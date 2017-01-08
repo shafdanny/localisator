@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.polytech.mathieu.localisator1.Localisation.MainActivity.spinner;
 import static com.polytech.mathieu.localisator1.Localisation.MainActivity.textView;
 
 
@@ -41,7 +42,7 @@ public class MyService extends Service {
     private LocationManager mLocationManager = null;
 
     // Interval de temps et de distance entre 2 mesures
-    private static final int LOCATION_INTERVAL = 10000; //en ms
+    private static final int LOCATION_INTERVAL = 100; //en ms
     private static final float LOCATION_DISTANCE = 0f;
 
 
@@ -51,35 +52,11 @@ public class MyService extends Service {
     File mFile = null;
 
 
-    /*
-    public MyService() {
-        createGpsFile();
-    }
-
-    private void createGpsFile() {
-        //Création du dossier "Coordonnees" à la racine de la mémoire internet du téléphone
-        mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
-        mDir.mkdirs();
-
-        // Création du fichier "donnees.json" dans le dossier "Coordonnees"
-        mFile = new File(mDir, fichier);
-        try {
-            mFile.createNewFile();
-            FileWriter fileWriter = new FileWriter(mFile, true);
-            fileWriter.write("date,time,latitude,longitude,altitude \n");
-            fileWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    } */
-
-
     public class LocationListener implements android.location.LocationListener {
 
         //Variables pour les données
         Location mLastLocation;
-        String donnees;
+        String donnees; // = "Données GPS... \n" + String.valueOf(spinner.getSelectedItem());
         Double altitude;
         String date;
 
@@ -117,6 +94,7 @@ public class MyService extends Service {
 
             //   donnees = date + "," + sLatitude + "," + sLongitude + "," + altitude + "\n";
 
+            Log.e(TAG, donnees);
             textView.setText(donnees);
 
             // Ecriture dans le .json
@@ -176,6 +154,8 @@ public class MyService extends Service {
     public void onCreate() {
         Log.e(TAG, "onCreate");
         initializeLocationManager();
+
+
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,

@@ -9,8 +9,12 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.polytech.mathieu.localisator1.Maps.MapsActivity;
 import com.polytech.mathieu.localisator1.R;
@@ -28,14 +32,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "TestGPS";
     public static TextView textView;
+    public static EditText editText;
+    public static Spinner spinner;
+
+    File mDir = null;
+    File mFile = null;
+    String fichier = "param.json";
 
     static final int SocketServerPORT = 8181;
-    private final String ServerAdress = "192.168.1.179";
+    private String ServerAdress; // = editText.getText().toString();
+    private String nbCluster;
 
     Socket clientSocket;
     public boolean launch = false;
@@ -57,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(LOCATION_PERMS, 15);
         }
         textView = (TextView) findViewById(R.id.coordonnees);
+        editText = (EditText) findViewById(R.id.editIP);
+        spinner = (Spinner) findViewById(R.id.spinner);
         final Intent intent = new Intent(this, MyService.class);
+
+        addItemsOnSpinner();
 
         final Button buttonStart = (Button) findViewById(R.id.start);
         final Button buttonStop = (Button) findViewById(R.id.stop);
@@ -89,12 +106,26 @@ public class MainActivity extends AppCompatActivity {
 
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                ServerAdress = editText.getText().toString();
+                if (ServerAdress == null){
+                    Log.e(TAG, "Merci d'entrer l'adresse IP du serveur");
+                }
+                else{
 
-                Log.d(MyService.TAG, "Envoie données!\n");
-                uploadFile(Uri.parse(""));
 
-                serverSocketThread = new ServerSocketThread();
-                serverSocketThread.start();
+                    try {
+                        ecritureParam();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    Log.e(TAG, String.valueOf(spinner.getSelectedItem()));
+                    Log.d(MyService.TAG, "Envoie données à " + ServerAdress + "\n");
+                    uploadFile(Uri.parse(""));
+                    serverSocketThread = new ServerSocketThread();
+                    serverSocketThread.start();
+                }
             }
         });
 
@@ -105,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent1);
             }
         });
+
     }
 
     // Charger le fichier gps vers le serveur
@@ -115,36 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
         File mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
         File file = new File(mDir, "donnees.json");
-
-/*
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
-        // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-
-        // add another part within the multipart request
-        String descriptionString = "hello, this is description speaking";
-        RequestBody description =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data"), descriptionString);
-
-        // finally, execute the request
-        Call<ResponseBody> call = service.upload(description, body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call,
-                                   Response<ResponseBody> response) {
-                Log.v("Upload", "success");
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-            }
-        }); */
     }
 
 // Méthode qui supprime les données dans le json
@@ -169,15 +171,71 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Méthode pour afficher un toast
+    public void showToast(final String toast)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // add items into spinner dynamically
+    public void addItemsOnSpinner() {
+
+        List<String> list = new ArrayList<String>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        list.add("4");
+        list.add("5");
+        list.add("6");
+        list.add("7");
+        list.add("8");
+        list.add("9");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
+    }
+
+    private void ecritureParam() throws IOException {
+
+        String donnees = "Données GPS... \n" + String.valueOf(spinner.getSelectedItem()) + "\n";
+        // Ecriture dans le .json
+
+        //Création du dossier "Coordonnees" à la racine de la mémoire internet du téléphone
+        mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
+        mDir.mkdirs();
+
+        // Création du fichier "donnees.json" dans le dossier "Coordonnees"
+        mFile = new File(mDir, fichier);
+        try {
+            mFile.createNewFile();
+            FileWriter fileWriter = new FileWriter(mFile, false);
+            fileWriter.write(donnees);
+            fileWriter.close();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     //Création du thread qui attend une connexion
     public class ServerSocketThread extends Thread {
 
         @Override
         public void run() {
             Socket socket = null;
+
            // Log.e(TAG, "En attente d'une connexion...\n");
             try {
-                clientSocket = new Socket(ServerAdress, SocketServerPORT);
+                    clientSocket = new Socket(ServerAdress, SocketServerPORT);
 
                 Log.e(TAG, "Connexion au serveur...\n");;
                 Log.e(TAG, "Connexion établie...\n");
@@ -186,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             } catch (IOException e) {
+                //Log.e(TAG, "Impossible de se connecter");
+                showToast("Adresse IP invalide");
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
@@ -220,21 +280,39 @@ public class MainActivity extends AppCompatActivity {
                     Environment.getExternalStorageDirectory().getPath()+"/Coordonnees",
                     "traitement.json");
 
+            File file3 = new File(
+                    Environment.getExternalStorageDirectory().getPath()+"/Coordonnees",
+                    "param.json");
+
             Log.e(TAG, "Envoie du fichier...\n");
 
-            byte[] bytes = new byte[(int) file1.length()];
-            BufferedInputStream bis;
+            byte[] bytes1 = new byte[(int) file1.length()];
+            BufferedInputStream bis1;
+            byte[] bytes3 = new byte[(int) file3.length()];
+            BufferedInputStream bis3;
             try {
-                bis = new BufferedInputStream(new FileInputStream(file1));
-                bis.read(bytes, 0, bytes.length);
-                OutputStream os = socket.getOutputStream();
-                os.write(bytes, 0, bytes.length);
-                os.flush();
+                int available = -1;
+                bis1 = new BufferedInputStream(new FileInputStream(file1));
+                OutputStream os1 = socket.getOutputStream();
 
 
-                //Test
+                while ((available = bis1.read(bytes1)) > 0){
+                    os1.write(bytes1, 0, available);
+                }
+
+                os1.flush();
+
+
+                bis3 = new BufferedInputStream(new FileInputStream(file3));
+                bis3.read(bytes3, 0, bytes3.length);
+                OutputStream os3 = socket.getOutputStream();
+                os3.write(bytes3, 0, bytes3.length);
+                os3.flush();
+
+
+                //Reception
                 System.out.println("Reception du fichier...");
-                byte[] bytes2 = new byte[1024];
+                byte[] bytes2 = new byte[2048];
                 InputStream is = socket.getInputStream();
                 FileOutputStream fos = new FileOutputStream(file2);
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -245,15 +323,6 @@ public class MainActivity extends AppCompatActivity {
 
                 socket.close();
 
-        /*        final String sentMsg = "File sent to: " + socket.getInetAddress();
-                MainActivity.this.runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this,
-                                sentMsg,
-                                Toast.LENGTH_LONG).show();
-                    }}); */
 
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block

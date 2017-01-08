@@ -1,8 +1,10 @@
 package com.polytech.mathieu.localisator1.Maps;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.polytech.mathieu.localisator1.Localisation.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,17 +14,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.polytech.mathieu.localisator1.Localisation.MainActivity.spinner;
+
 /**
  * Created by user on 02/01/17.
  */
 
 public class Traitement {
 
-    List<Float> list = new ArrayList();
-    public static LatLng cluster1;
-    public static LatLng cluster2;
+    List<Float> list = new ArrayList<>();
+    public static List<LatLng> listMarker = new ArrayList<>();
+    public static int nbCluster;
+
 
     public void recuperation() {
+
+
+        nbCluster = Integer.parseInt(String.valueOf(spinner.getSelectedItem()));
 
         //Ouverture du fichier
         FileReader input = null;
@@ -45,17 +53,20 @@ public class Traitement {
         int i = 1;
 
         try {
-            while ( (myLine = bufRead.readLine()) != null && i < 3){
+            while ( (myLine = bufRead.readLine()) != null){ //&& i < nbCluster+1){
                 String[] array = myLine.split(",");
                 i++;
-                System.out.println("Array 1 " + array[1]);
 
                 list.add(Float.parseFloat(array[1]));
                 list.add(Float.parseFloat(array[3]));
             }
 
-            cluster1 = new LatLng(list.get(0), list.get(1));
-            cluster2 = new LatLng(list.get(2), list.get(3));
+
+            for (int j = 0; j<nbCluster; j++){
+                listMarker.add(j, new LatLng(list.get(j), list.get(j+1)));
+            }
+            //cluster1 = new LatLng(list.get(0), list.get(1));
+            //cluster2 = new LatLng(list.get(2), list.get(3));
 
         } catch (IOException e) {
             e.printStackTrace();

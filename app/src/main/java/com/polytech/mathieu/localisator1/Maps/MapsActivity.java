@@ -51,8 +51,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Add a marker in Biot and move the camera
         LatLng biot = new LatLng(43.616745, 7.066663);
 
-        mMap.addMarker(new MarkerOptions().position(Traitement.cluster1).title("Cluster1"));
-        mMap.addMarker(new MarkerOptions().position(Traitement.cluster2).title("Cluster2"));
+        for(int i = 0; i< Traitement.nbCluster; i++){
+            mMap.addMarker(new MarkerOptions().position(Traitement.listMarker.get(i)).title("Cluster"+i));
+        }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(biot));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
     }
