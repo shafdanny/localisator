@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.polytech.mathieu.localisator1.Maps.MapsActivity;
 import com.polytech.mathieu.localisator1.R;
+import com.polytech.mathieu.localisator1.data.IdGenerator;
 import com.polytech.mathieu.localisator1.network.FileUploadService;
 import com.polytech.mathieu.localisator1.network.ServiceGenerator;
 
@@ -34,6 +35,14 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean launch = false;
 
     ServerSocketThread serverSocketThread;
+    static String uuid = IdGenerator.generate();
 
     private static final String[] LOCATION_PERMS={
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -81,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonErase = (Button) findViewById(R.id.erase);
         final Button buttonLaunch = (Button) findViewById(R.id.launch);
         final Button buttonMap = (Button) findViewById(R.id.bmap);
+
+        Log.d(TAG, "onCreate: unique id: " + IdGenerator.generate());
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -147,6 +159,35 @@ public class MainActivity extends AppCompatActivity {
 
         File mDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Coordonnees");
         File file = new File(mDir, "donnees.json");
+
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        // add another part within the multipart request
+        String descriptionString = uuid;
+        RequestBody description =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"), descriptionString);
+
+        // finally, execute the request
+        Call<ResponseBody> call = service.upload(description, body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v("Upload", "success");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
     }
 
 // Méthode qui supprime les données dans le json
