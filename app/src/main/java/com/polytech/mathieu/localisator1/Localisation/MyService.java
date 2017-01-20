@@ -18,24 +18,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.polytech.mathieu.localisator1.Localisation.MainActivity.spinner;
 import static com.polytech.mathieu.localisator1.Localisation.MainActivity.textView;
 
-
-/*
-*   Auteur : Mathieu Stackler
-*   Service qui récupère l'heure, la latitude, la longitude et l'altitude de l'utilisateur
-*
+/**
+ *  Auteur : Mathieu Stackler
+ *  Service qui récupère l'heure, la latitude, la longitude et l'altitude de l'utilisateur
  */
-
-
 public class MyService extends Service {
 
 
     DateFormat format = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
+    DateFormat filenameFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
     //TAG pour les tests
     public static final String TAG = "TestGPS";
@@ -47,7 +44,7 @@ public class MyService extends Service {
 
 
     //Variables pour l'écriture dans le json
-    String fichier = "donnees.json";
+    String fichier = "defaultFileName";
     File mDir = null;
     File mFile = null;
 
@@ -155,6 +152,10 @@ public class MyService extends Service {
         Log.e(TAG, "onCreate");
         initializeLocationManager();
 
+        Date tmp = Calendar.getInstance().getTime();
+        String date = filenameFormat.format(tmp);
+        Log.d(TAG, "LocationListener: creation: " + date);
+        fichier = date;
 
         try {
             mLocationManager.requestLocationUpdates(

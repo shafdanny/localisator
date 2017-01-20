@@ -3,7 +3,6 @@ package com.polytech.mathieu.localisator1.model;
 /**
  * Created by shafiq on 20/01/2017.
  */
-
 public class Point {
 
     private double x = 0;

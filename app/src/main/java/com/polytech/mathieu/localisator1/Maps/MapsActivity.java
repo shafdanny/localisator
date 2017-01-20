@@ -20,7 +20,6 @@ import java.util.List;
 /**
  * Created by Nahia on 28/12/2016.
  */
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
