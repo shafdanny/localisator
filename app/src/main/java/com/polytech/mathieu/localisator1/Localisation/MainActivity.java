@@ -203,14 +203,8 @@ public class MainActivity extends AppCompatActivity {
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
-        // add another part within the multipart request
-        String descriptionString = uuid;
-        RequestBody description =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data"), descriptionString);
-
         // finally, execute the request
-        Call<ResponseBody> call = service.upload(description, 2, body);
+        Call<ResponseBody> call = service.upload(uuid, 2, body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call,

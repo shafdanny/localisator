@@ -18,7 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -30,9 +29,7 @@ import static com.polytech.mathieu.localisator1.Localisation.MainActivity.textVi
  */
 public class MyService extends Service {
 
-
     DateFormat format = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
-    DateFormat filenameFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
     //TAG pour les tests
     public static final String TAG = "TestGPS";
@@ -42,12 +39,10 @@ public class MyService extends Service {
     private static final int LOCATION_INTERVAL = 100; //en ms
     private static final float LOCATION_DISTANCE = 0f;
 
-
     //Variables pour l'écriture dans le json
-    String fichier = "defaultFileName";
+    String fichier = "donnees.json";
     File mDir = null;
     File mFile = null;
-
 
     public class LocationListener implements android.location.LocationListener {
 
@@ -57,12 +52,10 @@ public class MyService extends Service {
         Double altitude;
         String date;
 
-
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
-
 
         //A chaque fois que la localisation change, cette fonction est appelée
         @Override
@@ -79,7 +72,6 @@ public class MyService extends Service {
 
             double longitude = mLastLocation.getLongitude();
             String sLongitude = String.format(Locale.US,"%8.6f", longitude);
-
 
             donnees = "Temps," + date +
                     // ",Latitude," + mLastLocation.convert(location.getLatitude(), Location.FORMAT_DEGREES) +
@@ -151,11 +143,6 @@ public class MyService extends Service {
     public void onCreate() {
         Log.e(TAG, "onCreate");
         initializeLocationManager();
-
-        Date tmp = Calendar.getInstance().getTime();
-        String date = filenameFormat.format(tmp);
-        Log.d(TAG, "LocationListener: creation: " + date);
-        fichier = date;
 
         try {
             mLocationManager.requestLocationUpdates(
