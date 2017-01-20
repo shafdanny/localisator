@@ -3,7 +3,6 @@ package com.polytech.mathieu.localisator1.Localisation;
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -56,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     public static Spinner spinner;
 
     public static final String PREFS_NAME = "LocalisatorPrefs";
+
+    public static List<Cluster> clusters;
 
     File mDir = null;
     File mFile = null;
@@ -129,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
         buttonLaunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ServerAdress = editText.getText().toString();
-                if (ServerAdress == null){
+                if (ServerAdress == null || ServerAdress.equals("")){
+                    showToast("Merci d'entrer l'adresse IP du serveur");
                     Log.e(TAG, "Merci d'entrer l'adresse IP du serveur");
                 }
                 else{
@@ -142,9 +144,9 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.e(TAG, String.valueOf(spinner.getSelectedItem()));
                     Log.d(MyService.TAG, "Envoie données à " + ServerAdress + "\n");
-                    uploadFile(Uri.parse(""));
-                    serverSocketThread = new ServerSocketThread();
-                    serverSocketThread.start();
+                    uploadFile(ServerAdress);
+                    //serverSocketThread = new ServerSocketThread();
+                    //serverSocketThread.start();
                 }
             }
         });
@@ -184,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Charger le fichier gps vers le serveur
-    private void uploadFile(Uri fileUri) {
+    private void uploadFile(String serverAdress) {
+        ServiceGenerator.changeApiBaseUrl(serverAdress);
         // create upload service client
         FileUploadService service =
                 ServiceGenerator.createService(FileUploadService.class);
@@ -213,14 +216,21 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
                 Log.v("Upload response code: ", "" + response.code());
-                try {
-                    String jsonResponse = response.body().string();
-                    Log.i(TAG, "onResponse: response message: " + jsonResponse);
 
-                    List<Cluster> clusters = new Gson().fromJson(jsonResponse, new TypeToken<List<Cluster>>(){}.getType());
+                if(response.code() == 200) {
+                    try {
+                        String jsonResponse = response.body().string();
+                        Log.i(TAG, "onResponse: response message: " + jsonResponse);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        clusters = new Gson().fromJson(jsonResponse, new TypeToken<List<Cluster>>(){}.getType());
+
+                        showToast("Request OK, response received");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    showToast("Request failed, please check server address");
                 }
             };
 

@@ -3,14 +3,19 @@ package com.polytech.mathieu.localisator1.Maps;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.polytech.mathieu.localisator1.Localisation.MainActivity;
 import com.polytech.mathieu.localisator1.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nahia on 28/12/2016.
@@ -50,13 +55,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker in Biot and move the camera
         LatLng biot = new LatLng(43.616745, 7.066663);
+        List<MarkerOptions> markers = new ArrayList<>();
 
-        for(int i = 0; i< Traitement.nbCluster; i++){
-            mMap.addMarker(new MarkerOptions().position(Traitement.listMarker.get(i)).title("Cluster"+i));
+        for(int i = 0; i< MainActivity.clusters.size(); i++){
+            MarkerOptions marker = new MarkerOptions()
+                    .position(new LatLng(MainActivity.clusters.get(i).getCentroid().getX(),
+                            MainActivity.clusters.get(i).getCentroid().getY()))
+                    .title("Cluster"+i);
+            mMap.addMarker(marker);
+            markers.add(marker);
         }
 
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (MarkerOptions marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 300; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        /*
         mMap.moveCamera(CameraUpdateFactory.newLatLng(biot));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));*/
+        mMap.animateCamera(cu);
     }
 
 
