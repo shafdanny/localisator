@@ -100,7 +100,6 @@ public class MyService extends Service {
                 fileWriter.write(donnees);
                 fileWriter.close();
 
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -203,8 +203,10 @@ public class MainActivity extends AppCompatActivity {
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
+        int nbCluster = Integer.parseInt(String.valueOf(spinner.getSelectedItem()));
+
         // finally, execute the request
-        Call<ResponseBody> call = service.upload(uuid, 2, body);
+        Call<ResponseBody> call = service.upload(uuid, nbCluster, body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call,
@@ -272,15 +274,15 @@ public class MainActivity extends AppCompatActivity {
     public void addItemsOnSpinner() {
 
         List<String> list = new ArrayList<String>();
-        list.add("1");
+        //list.add("1");
         list.add("2");
         list.add("3");
         list.add("4");
-        list.add("5");
+        /*list.add("5");
         list.add("6");
         list.add("7");
         list.add("8");
-        list.add("9");
+        list.add("9");*/
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
