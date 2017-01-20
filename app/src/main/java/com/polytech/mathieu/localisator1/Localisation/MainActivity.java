@@ -2,6 +2,7 @@ package com.polytech.mathieu.localisator1.Localisation;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +17,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.polytech.mathieu.localisator1.Maps.MapsActivity;
 import com.polytech.mathieu.localisator1.R;
 import com.polytech.mathieu.localisator1.data.IdGenerator;
+import com.polytech.mathieu.localisator1.model.Cluster;
 import com.polytech.mathieu.localisator1.network.FileUploadService;
 import com.polytech.mathieu.localisator1.network.ServiceGenerator;
 
@@ -51,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     public static EditText editText;
     public static Spinner spinner;
 
+    public static final String PREFS_NAME = "LocalisatorPrefs";
+
     File mDir = null;
     File mFile = null;
     String fichier = "param.json";
@@ -63,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean launch = false;
 
     ServerSocketThread serverSocketThread;
-    static String uuid = IdGenerator.generate();
+    static String uuid;
 
     private static final String[] LOCATION_PERMS={
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -76,9 +82,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(LOCATION_PERMS, 15);
         }
+
         textView = (TextView) findViewById(R.id.coordonnees);
         editText = (EditText) findViewById(R.id.editIP);
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -92,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonLaunch = (Button) findViewById(R.id.launch);
         final Button buttonMap = (Button) findViewById(R.id.bmap);
 
-        Log.d(TAG, "onCreate: unique id: " + IdGenerator.generate());
+        uuid = getUserId();
+
+        Log.i(TAG, "onCreate: unique id: " + uuid);
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -124,13 +134,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
 
-
                     try {
                         ecritureParam();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
 
                     Log.e(TAG, String.valueOf(spinner.getSelectedItem()));
                     Log.d(MyService.TAG, "Envoie données à " + ServerAdress + "\n");
@@ -151,6 +159,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * Get a user id that is saved in SharedPreferences.
+     * If an id does not exist, create one.
+     *
+     * @return userId
+     */
+    private String getUserId() {
+        String uuid = "";
+        String prefIdKey = "id";
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        uuid = settings.getString(prefIdKey, "");
+
+        if(uuid.equals("")) {
+            uuid = IdGenerator.generate();
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(prefIdKey, uuid);
+            editor.apply();
+        }
+
+        return uuid;
+    }
+
     // Charger le fichier gps vers le serveur
     private void uploadFile(Uri fileUri) {
         // create upload service client
@@ -161,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(mDir, "donnees.json");
 
         // create RequestBody instance from file
-        RequestBody requestFile =
+        final RequestBody requestFile =
                 RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
         // MultipartBody.Part is used to send also the actual file name
@@ -175,13 +207,22 @@ public class MainActivity extends AppCompatActivity {
                         MediaType.parse("multipart/form-data"), descriptionString);
 
         // finally, execute the request
-        Call<ResponseBody> call = service.upload(description, body);
+        Call<ResponseBody> call = service.upload(description, 2, body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
-                Log.v("Upload", "success");
-            }
+                Log.v("Upload response code: ", "" + response.code());
+                try {
+                    String jsonResponse = response.body().string();
+                    Log.i(TAG, "onResponse: response message: " + jsonResponse);
+
+                    List<Cluster> clusters = new Gson().fromJson(jsonResponse, new TypeToken<List<Cluster>>(){}.getType());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
@@ -361,9 +402,7 @@ public class MainActivity extends AppCompatActivity {
                 bos.write(bytes2, 0, bytesRead);
                 bos.close();
 
-
                 socket.close();
-
 
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
