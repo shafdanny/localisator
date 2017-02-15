@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonErase = (Button) findViewById(R.id.erase);
         final Button buttonLaunch = (Button) findViewById(R.id.launch);
         final Button buttonMap = (Button) findViewById(R.id.bmap);
+        final Button buttonFindMatch = (Button) findViewById(R.id.match);
 
         uuid = getUserId();
 
@@ -159,6 +160,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        buttonFindMatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ServerAdress = editText.getText().toString();
+                if (ServerAdress == null || ServerAdress.equals("")){
+                    showToast("Merci d'entrer l'adresse IP du serveur");
+                    Log.e(TAG, "Merci d'entrer l'adresse IP du serveur");
+                }
+                else{
+
+                    try {
+                        ecritureParam();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.d(MyService.TAG, "Finding match for " + uuid + " ServerAdress " + ServerAdress + "\n");
+                    getMatch(ServerAdress);
+                    //serverSocketThread = new ServerSocketThread();
+                    //serverSocketThread.start();
+                }
+            }
+        });
+
     }
 
     /**
@@ -185,7 +210,50 @@ public class MainActivity extends AppCompatActivity {
         return uuid;
     }
 
-    // Charger le fichier gps vers le serveur
+    /**
+     * Find a match from the server
+     *
+     * @param serverAdress
+     */
+    private void getMatch(String serverAdress) {
+        ServiceGenerator.changeApiBaseUrl(serverAdress);
+        FileUploadService service =
+                ServiceGenerator.createService(FileUploadService.class);
+
+        Call<ResponseBody> call = service.getMatch(uuid);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v("Find Match response: ", "" + response.code());
+
+                if(response.code() == 200) {
+                    try {
+                        String jsonResponse = response.body().string();
+                        Log.i(TAG, "onResponse: response message: " + jsonResponse);
+                        showToast("Request OK, response received");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    showToast("Request failed, please check server address");
+                }
+            };
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+    }
+
+
+    /**
+     * Upload the GPS data to the server
+     *
+     * @param serverAdress
+     */
     private void uploadFile(String serverAdress) {
         ServiceGenerator.changeApiBaseUrl(serverAdress);
         // create upload service client
