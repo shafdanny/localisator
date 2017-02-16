@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     Socket clientSocket;
     public boolean launch = false;
 
-    ServerSocketThread serverSocketThread;
+    //ServerSocketThread serverSocketThread;
     static String uuid;
 
     private static final String[] LOCATION_PERMS={
@@ -234,10 +234,8 @@ public class MainActivity extends AppCompatActivity {
 
                         List<String> matchedUserId = new Gson().fromJson(jsonResponse, new TypeToken<List<String>>(){}.getType());
 
-                        for(String userId: matchedUserId) {
-                            Log.d(TAG, "matched user: " + userId);
-                            showToast("Match found: " + userId);
-                        }
+                        showToast("ID ayant les mêmes clusters : " + jsonResponse);
+
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -339,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             public void run()
             {
-                Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, toast, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -387,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+/*
     //Création du thread qui attend une connexion
     public class ServerSocketThread extends Thread {
 
@@ -423,9 +421,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+*/
     //Thread qui envoie le .json quand une demande est faite
-    public class FileTxThread extends Thread {
+  /*  public class FileTxThread extends Thread {
         Socket socket;
 
         FileTxThread(Socket socket){
@@ -503,6 +501,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-    }
+    } */
 
 }
