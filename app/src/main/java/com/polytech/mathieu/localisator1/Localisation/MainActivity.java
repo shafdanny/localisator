@@ -25,16 +25,9 @@ import com.polytech.mathieu.localisator1.model.Cluster;
 import com.polytech.mathieu.localisator1.network.FileUploadService;
 import com.polytech.mathieu.localisator1.network.ServiceGenerator;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView textView;
     public static EditText editText;
     public static Spinner spinner;
+    public static TextView userIdTv;
 
     public static final String PREFS_NAME = "LocalisatorPrefs";
 
@@ -91,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.coordonnees);
         editText = (EditText) findViewById(R.id.editIP);
         spinner = (Spinner) findViewById(R.id.spinner);
+        userIdTv = (TextView) findViewById(R.id.user_id_tv);
         final Intent intent = new Intent(this, MyService.class);
 
         addItemsOnSpinner();
@@ -103,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonFindMatch = (Button) findViewById(R.id.match);
 
         uuid = getUserId();
+        userIdTv.setText("User ID: " + uuid);
 
         Log.i(TAG, "onCreate: unique id: " + uuid);
 
