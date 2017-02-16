@@ -231,7 +231,13 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         String jsonResponse = response.body().string();
                         Log.i(TAG, "onResponse: response message: " + jsonResponse);
-                        showToast("Request OK, response received");
+
+                        List<String> matchedUserId = new Gson().fromJson(jsonResponse, new TypeToken<List<String>>(){}.getType());
+
+                        for(String userId: matchedUserId) {
+                            Log.d(TAG, "matched user: " + userId);
+                            showToast("Match found: " + userId);
+                        }
 
                     } catch (IOException e) {
                         e.printStackTrace();
