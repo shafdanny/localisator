@@ -36,7 +36,7 @@ public class MyService extends Service {
     private LocationManager mLocationManager = null;
 
     // Interval de temps et de distance entre 2 mesures
-    private static final int LOCATION_INTERVAL = 100; //en ms
+    private static final int LOCATION_INTERVAL = 10000; //en ms
     private static final float LOCATION_DISTANCE = 0f;
 
     //Variables pour l'écriture dans le json
